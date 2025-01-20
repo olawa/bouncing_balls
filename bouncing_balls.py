@@ -1,6 +1,10 @@
 from tkinter import *
 import random as r
 
+# set window height and width and define the colors to use:
+h = w = 1000
+colors = ['blue', 'black', 'green', 'red', 'yellow', 'orange', 'purple', 'lightblue', 'blue', 'pink', 'grey']
+ball_dict = {} # link id from creat_oval to Ball
 
 class App(Tk):
     """ creates an app with a frame for balls and input boxes for gravity etc """
@@ -47,7 +51,7 @@ class App(Tk):
         for i in range(int(self.num_balls.get())):
             rad = r.randint(w // 50, w // 20)
             origo = r.randint(rad+100,w-rad-100), r.randint(rad+100,h-rad-100)
-            new_ball = Ball(rad, origo[0], origo[1], colors[r.randint(0,len(colors)-1)], self.delay, self.current_gravity)
+            new_ball = Ball(self, rad, origo[0], origo[1], colors[r.randint(0,len(colors)-1)], self.delay, self.current_gravity)
             ball_dict[new_ball.ball] = new_ball
             new_ball.move()
         
@@ -68,7 +72,7 @@ class Ball():
     creates balls with random colors, sie and speed and adds to the app 
     and to a global dict for reference in collission
     """
-    def __init__(self, size, xpos, ypos, col, delay, current_gravity):
+    def __init__(self, app, size, xpos, ypos, col, delay, current_gravity):
         self.color = col
         self.size = size
         self.canvas = app.canvas
@@ -89,30 +93,30 @@ class Ball():
         return str(self.ball)
     
     def move(self):
-        app.canvas.move(self.ball, round(self.speedx), round(self.speedy) )
+        self.canvas.move(self.ball, round(self.speedx), round(self.speedy) )
         self.speedy += self.gravity * 0.1
        
-        if len(app.canvas.coords(self.ball)) > 0:
-            if len(app.canvas.coords(self.ball)) == 2:
-                x1, y1 = app.canvas.coords(self.ball)
+        if len(self.canvas.coords(self.ball)) > 0:
+            if len(self.canvas.coords(self.ball)) == 2:
+                x1, y1 = self.canvas.coords(self.ball)
                 x2, y2 = x1 + self.width, y1 + self.height
             else:
-                x1, y1, x2, y2 = app.canvas.coords(self.ball)
+                x1, y1, x2, y2 = self.canvas.coords(self.ball)
             if x1 <= 0 or x2 >= w:
                 self.speedx *= -1
             if y1 <=0 or y2 >= h: 
                 self.speedy = -self.speedy * 0.8
                 if y2 >= h: # avoid losing balls due to gravity
-                    app.canvas.move(self.ball, 0, - self.gravity) 
-            coll = list(app.canvas.find_overlapping(x1, y1, x2, y2)) # get a list of colliding balls
+                    self.canvas.move(self.ball, 0, - self.gravity) 
+            coll = list(self.canvas.find_overlapping(x1, y1, x2, y2)) # get a list of colliding balls
             if self.ball in coll:
                 coll.remove(self.ball)            
             for i in coll:
                 if self.color == "black" and ball_dict[i].color != "black":
-                    app.canvas.delete(i)
+                    self.canvas.delete(i)
                     del ball_dict[i]
                 elif ball_dict[i].color ==  "black" and self.color != "black":
-                    app.canvas.delete(self.ball)
+                    self.canvas.delete(self.ball)
                 else: # change direction (should use a function to calculate new direction)
                     ball_dict[i].speedx *= -1
                     ball_dict[i].speedy *= -1
@@ -122,9 +126,11 @@ class Ball():
                 self.canvas.after(self.delay, self.move)
  
 
-colors = ['blue', 'black', 'green', 'red', 'yellow', 'orange', 'purple', 'lightblue', 'blue', 'pink', 'grey']
-ball_dict = {} # link id from creat_oval to Ball
-h = w = 1000
-app = App(h, w)
-app.start("<Button-1>") # start the simulation
-app.mainloop()
+def main():
+    app = App(h, w)
+    app.start("<Button-1>") # start the simulation
+    app.mainloop()
+
+
+if __name__ == '__main__':
+	main()
