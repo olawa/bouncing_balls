@@ -4,10 +4,10 @@ import random as r
 
 class App(Tk):
     """ creates an app with a frame for balls and input boxes for gravity etc """
-    def __init__(self):
+    def __init__(self, h, w):
         super().__init__()
         self.frame = Frame(self)
-        self.canvas = Canvas(self, width=1200, height=1200, background='gray75') #,
+        self.canvas = Canvas(self, width=w, height=h, background='gray75') #,
         self.canvas.grid(row=0,column=1)
         self.frame.grid(row=0,column=0, sticky="n")
         self.gravity = StringVar()
@@ -124,7 +124,7 @@ class Ball():
 
 colors = ['blue', 'black', 'green', 'red', 'yellow', 'orange', 'purple', 'lightblue', 'blue', 'pink', 'grey']
 ball_dict = {} # link id from creat_oval to Ball
-
-app = App()
+h = w = 1000
+app = App(h, w)
 app.start("<Button-1>") # start the simulation
 app.mainloop()
